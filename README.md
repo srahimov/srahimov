@@ -18,3 +18,7 @@ All text lives in [`src/data.js`](src/data.js): profile, the LangChain / LangGra
 ```bash
 npm run build   # outputs to dist/
 ```
+
+## Deploy
+
+Hosted on Cloudflare Pages at [srahimov.site](https://srahimov.site). Every push to `main` builds and deploys automatically; other branches get preview URLs.
