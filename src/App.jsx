@@ -10,16 +10,18 @@ import {
   ScopeIcon,
 } from './components/Icons'
 import { experience, profile, projects, stack } from './data'
+import MultimodalRag from './pages/MultimodalRag'
 
 const stackIcons = { langchain: ChainIcon, langgraph: GraphIcon, langsmith: ScopeIcon }
 
 const navLinks = [
-  { href: '#projects', label: 'Projects' },
-  { href: '#experience', label: 'Experience' },
-  { href: '#contact', label: 'Contact' },
+  { href: '/#projects', label: 'Projects' },
+  { href: '/multimodal-rag', label: 'Multimodal RAG' },
+  { href: '/#experience', label: 'Experience' },
+  { href: '/#contact', label: 'Contact' },
 ]
 
-function Header() {
+function Header({ path }) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -33,7 +35,7 @@ function Header() {
   return (
     <header className={`header ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="container header-inner">
-        <a href="#top" className="logo" onClick={() => setOpen(false)}>
+        <a href="/" className="logo" onClick={() => setOpen(false)}>
           <span className="logo-mark">SR</span>
           <span className="logo-text">{profile.name}</span>
         </a>
@@ -49,7 +51,12 @@ function Header() {
         </button>
         <nav className={`nav ${open ? 'is-open' : ''}`}>
           {navLinks.map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)}>
+            <a
+              key={l.href}
+              href={l.href}
+              className={path === l.href ? 'is-active' : ''}
+              onClick={() => setOpen(false)}
+            >
               {l.label}
             </a>
           ))}
@@ -143,9 +150,15 @@ function Projects() {
                     </span>
                   ))}
                 </div>
-                <a href={p.link} target="_blank" rel="noreferrer" aria-label={`${p.title} on GitHub`} className="project-link">
-                  <GithubIcon />
-                </a>
+                {p.link.startsWith('/') ? (
+                  <a href={p.link} className="project-demo">
+                    Try it <ArrowIcon />
+                  </a>
+                ) : (
+                  <a href={p.link} target="_blank" rel="noreferrer" aria-label={`${p.title} on GitHub`} className="project-link">
+                    <GithubIcon />
+                  </a>
+                )}
               </div>
               <h3>{p.title}</h3>
               <p>{p.description}</p>
@@ -215,17 +228,25 @@ function Contact() {
   )
 }
 
+function Home() {
+  return (
+    <>
+      <Hero />
+      <Projects />
+      <Experience />
+      <Contact />
+    </>
+  )
+}
+
 export default function App() {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/'
+
   return (
     <>
       <div className="grid-overlay" aria-hidden="true" />
-      <Header />
-      <main>
-        <Hero />
-        <Projects />
-        <Experience />
-        <Contact />
-      </main>
+      <Header path={path} />
+      <main>{path === '/multimodal-rag' ? <MultimodalRag /> : <Home />}</main>
       <footer className="footer">
         <div className="container">
           © {new Date().getFullYear()} {profile.name} · <span className="mono">built with React</span>

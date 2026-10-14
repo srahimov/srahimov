@@ -37,6 +37,14 @@ export const stack = [
 
 export const projects = [
   {
+    title: 'Multimodal RAG',
+    tech: ['LangChain', 'LangSmith'],
+    description:
+      'A LangChain-based retrieval system that answers questions over text, images and PDFs, grounding every response in retrieved sources.',
+    highlights: ['Text + image + PDF retrieval', 'Grounded, cited answers', 'Live demo on this site'],
+    link: '/multimodal-rag',
+  },
+  {
     title: 'Knowledge Base RAG Assistant',
     tech: ['LangChain', 'LangSmith'],
     description:
