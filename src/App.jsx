@@ -11,12 +11,14 @@ import {
 } from './components/Icons'
 import { experience, profile, projects, stack } from './data'
 import MultimodalRag from './pages/MultimodalRag'
+import MultimodalSubagentRag from './pages/MultimodalSubagentRag'
 
 const stackIcons = { langchain: ChainIcon, langgraph: GraphIcon, langsmith: ScopeIcon }
 
 const navLinks = [
   { href: '/#projects', label: 'Projects' },
   { href: '/multimodal-rag', label: 'Multimodal RAG' },
+  { href: '/multimodal-subagent-rag', label: 'Subagent RAG' },
   { href: '/#experience', label: 'Experience' },
   { href: '/#contact', label: 'Contact' },
 ]
@@ -246,7 +248,15 @@ export default function App() {
     <>
       <div className="grid-overlay" aria-hidden="true" />
       <Header path={path} />
-      <main>{path === '/multimodal-rag' ? <MultimodalRag /> : <Home />}</main>
+      <main>
+        {path === '/multimodal-rag' ? (
+          <MultimodalRag />
+        ) : path === '/multimodal-subagent-rag' ? (
+          <MultimodalSubagentRag />
+        ) : (
+          <Home />
+        )}
+      </main>
       <footer className="footer">
         <div className="container">
           © {new Date().getFullYear()} {profile.name} · <span className="mono">built with React</span>

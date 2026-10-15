@@ -45,6 +45,14 @@ export const projects = [
     link: '/multimodal-rag',
   },
   {
+    title: 'Multimodal Subagent RAG',
+    tech: ['LangChain', 'LangGraph'],
+    description:
+      'A supervisor agent delegates each question to specialist subagents for text, images and tables, then synthesizes one grounded answer.',
+    highlights: ['Supervisor / subagent routing', 'Text, vision and table specialists', 'Live demo on this site'],
+    link: '/multimodal-subagent-rag',
+  },
+  {
     title: 'Knowledge Base RAG Assistant',
     tech: ['LangChain', 'LangSmith'],
     description:
