@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowIcon } from '../components/Icons'
-import { askSubagentRag, isConnected, subagents } from '../lib/subagentRag'
+import { citationLinks } from '../lib/rag'
+import { askSubagentRag } from '../lib/subagentRag'
 
 const examples = [
-  'Compare what the text and the illustrations say about the same topic.',
-  'Which table lists the values mentioned in chapter two?',
-  'Summarize the document and point to the supporting figures.',
+  "According to the translator's preface, what are the two purposes of this treatise?",
+  "What topics are listed in the book's table of contents?",
+  'Describe the illustration of a physician and his patient.',
 ]
 
 export default function MultimodalSubagentRag() {
@@ -13,23 +14,14 @@ export default function MultimodalSubagentRag() {
   const [status, setStatus] = useState('idle') // idle | loading | done | error
   const [result, setResult] = useState(null)
   const [asked, setAsked] = useState('')
-  const [activeStep, setActiveStep] = useState(0)
   const requestRef = useRef(null)
-  const responseRef = useRef(null)
   const length = [...question].length
+  const responseRef = useRef(null)
 
   useEffect(() => {
     document.title = 'Multimodal Subagent RAG · S. Rahimov'
     return () => requestRef.current?.abort()
   }, [])
-
-  // Walk through the subagent pipeline while a request is running.
-  useEffect(() => {
-    if (status !== 'loading') return
-    setActiveStep(0)
-    const id = setInterval(() => setActiveStep((s) => Math.min(s + 1, subagents.length - 1)), 700)
-    return () => clearInterval(id)
-  }, [status])
 
   const submit = async (e) => {
     e?.preventDefault()
@@ -49,11 +41,10 @@ export default function MultimodalSubagentRag() {
       setStatus('done')
     } catch (err) {
       if (!controller.signal.aborted) {
-        const message =
-          err.name === 'TimeoutError'
-            ? 'The question timed out. Please try again.'
-            : err.message || 'Question answering is unavailable. Please try again.'
-        setResult({ answer: message })
+        const retry = err.retryAfter ? ` Try again in ${err.retryAfter} seconds.` : ''
+        const message = err.name === 'TimeoutError' ? 'The question timed out. Please try again.'
+          : err.status ? err.message : 'Question answering is unavailable. Please try again.'
+        setResult({ answer: message + retry })
         setStatus('error')
       }
     } finally {
@@ -70,15 +61,15 @@ export default function MultimodalSubagentRag() {
       <div className="container rag-inner">
         <header className="rag-head">
           <p className="eyebrow">
-            <span className={`pulse ${isConnected ? '' : 'is-off'}`} />
-            {isConnected ? 'Live · LangChain subagents' : 'Demo · backend coming soon'}
+            <span className="pulse" />
+            Live · Supervisor + PDF subagent
           </p>
           <h1>
             <span className="gradient-text">Multimodal Subagent RAG</span>
           </h1>
           <p className="rag-sub">
-            A supervisor agent built with LangChain splits each question across specialist subagents for text, images
-            and tables, then synthesizes their findings into one grounded answer.
+            Ask about Avicenna’s Canon of Medicine. A LangChain supervisor delegates to a PDF subagent that
+            retrieves text, tables and reviewed images, then synthesizes an answer with source and page citations.
           </p>
         </header>
 
@@ -100,7 +91,7 @@ export default function MultimodalSubagentRag() {
             id="subagent-question"
             className="chat-input"
             rows={4}
-            placeholder="Ask a question for the subagents…"
+            placeholder="Ask a question about the reviewed book…"
             aria-describedby="subagent-question-limit"
             aria-invalid={length > 200}
             value={question}
@@ -109,9 +100,7 @@ export default function MultimodalSubagentRag() {
           />
 
           <div className="chat-actions">
-            <span className="question-limit" id="subagent-question-limit">
-              {length}/200 characters
-            </span>
+            <span className="question-limit" id="subagent-question-limit">{length}/200 characters</span>
             <span className="hint">Enter to send · Shift+Enter for new line</span>
             <button type="submit" className="btn-send" disabled={!question.trim() || length > 200 || status === 'loading'}>
               {status === 'loading' ? 'Thinking…' : 'Send'} <ArrowIcon />
@@ -142,7 +131,7 @@ export default function MultimodalSubagentRag() {
             {status === 'idle' && (
               <div className="response-empty">
                 <div className="orb" aria-hidden="true" />
-                <p>The subagents' combined answer will appear here.</p>
+                <p>Your grounded answer will appear here.</p>
               </div>
             )}
 
@@ -153,45 +142,30 @@ export default function MultimodalSubagentRag() {
             )}
 
             {status === 'loading' && (
-              <ol className="agent-steps">
-                {subagents.map((s, i) => (
-                  <li key={s.agent} className={i < activeStep ? 'is-done' : i === activeStep ? 'is-active' : ''}>
-                    <span className="agent-name mono">{s.agent}</span>
-                    <span className="agent-summary">{s.summary}</span>
-                  </li>
-                ))}
-              </ol>
+              <div className="thinking">
+                <span />
+                <span />
+                <span />
+                <p className="mono">retrieving book evidence · preparing a cited answer</p>
+              </div>
             )}
 
             {(status === 'done' || status === 'error') && result && (
               <>
                 <p className={`answer ${status === 'error' ? 'is-error' : ''}`}>{result.answer}</p>
-                {result.steps?.length > 0 && (
-                  <div className="sources">
-                    <h3 className="mono">Subagent trace</h3>
-                    <ol className="agent-steps">
-                      {result.steps.map((s, i) => (
-                        <li key={i} className="is-done">
-                          <span className="agent-name mono">{s.agent}</span>
-                          {s.summary && <span className="agent-summary">{s.summary}</span>}
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                )}
                 {result.sources?.length > 0 && (
                   <div className="sources">
                     <h3 className="mono">Sources</h3>
                     <ol>
-                      {result.sources.map((s, i) => (
-                        <li key={i}>
-                          {s.url?.startsWith('https:') ? (
-                            <a href={s.url} target="_blank" rel="noopener noreferrer">
-                              {s.title || s.url}
+                      {result.sources.map((source) => (
+                        <li key={source.citation_id}>
+                          <strong>{source.citation_id} · {source.source}</strong>
+                          <span>Page{source.physical_pages.length === 1 ? '' : 's'} {source.physical_pages.join(', ')}</span>
+                          {citationLinks(source).map(link => (
+                            <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer" className="citation-link">
+                              {link.label}
                             </a>
-                          ) : (
-                            s.title
-                          )}
+                          ))}
                         </li>
                       ))}
                     </ol>

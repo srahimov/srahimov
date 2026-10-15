@@ -1,11 +1,11 @@
 // Public JSON API: no credentials, attachments, conversation upload or automatic retries.
 const API_URL = (import.meta.env?.VITE_RAG_API_URL || 'https://qozon-api.qozontech.workers.dev').replace(/\/+$/, '')
 
-export async function askRag({ question, signal }) {
+export async function askRag({ question, signal, apiUrl = API_URL }) {
   if (typeof question !== 'string' || !question.trim() || [...question].length > 200) {
     throw new Error('Enter a question of 1–200 characters.')
   }
-  const res = await fetch(`${API_URL}/questions`, {
+  const res = await fetch(`${apiUrl}/questions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'omit',

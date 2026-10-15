@@ -40,3 +40,22 @@ production URL above is the default. Do not put any backend key in Vite variable
 node --test tests/rag.test.mjs
 npm run build
 ```
+
+## Multimodal Subagent RAG chat
+
+`/multimodal-subagent-rag` connects to the separate
+`https://qozon-multi-agent-api.qozontech.workers.dev/questions` endpoint. One
+LangChain supervisor delegates to one PDF subagent for Avicenna's Canon of
+Medicine. The specialist retrieves evidence and synthesizes a cited answer;
+the supervisor's privacy middleware handles visitor input and the returned answer.
+
+`src/lib/subagentRag.js` selects this API, reusing the public request, response,
+citation validation and error handling in `src/lib/rag.js`.
+`src/pages/MultimodalSubagentRag.jsx` displays answer text, source IDs, filenames,
+physical pages and approved source links. Loading is a waiting indicator, not a
+simulated execution trace. Demo replies and fictional specialist steps are removed.
+
+`VITE_SUBAGENT_RAG_API_URL` optionally overrides this page's API base URL at build
+time. No browser API key is needed. The existing `/multimodal-rag` page keeps its
+original API and its independent `VITE_RAG_API_URL` override. Both pages use a
+200-character question limit, a 60-second client deadline and no automatic retry.
