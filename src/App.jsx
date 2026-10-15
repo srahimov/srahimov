@@ -9,7 +9,8 @@ import {
   MailIcon,
   ScopeIcon,
 } from './components/Icons'
-import { experience, profile, projects, stack } from './data'
+import { profile, projects, skills, stack } from './data'
+import SkillGraph from './components/SkillGraph'
 import MultimodalRag from './pages/MultimodalRag'
 import MultimodalSubagentRag from './pages/MultimodalSubagentRag'
 
@@ -181,25 +182,8 @@ function Experience() {
   return (
     <section className="section" id="experience">
       <div className="container">
-        <SectionTitle index="02" title="Work Experience" kicker="Where I've built and shipped." />
-        <ol className="timeline">
-          {experience.map((e) => (
-            <li key={e.period + e.role} className="timeline-item">
-              <span className="timeline-dot" />
-              <div className="timeline-card">
-                <span className="period">{e.period}</span>
-                <h3>
-                  {e.role} <span className="at">@ {e.company}</span>
-                </h3>
-                <ul>
-                  {e.points.map((pt) => (
-                    <li key={pt}>{pt}</li>
-                  ))}
-                </ul>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <SectionTitle index="02" title="Work Experience" kicker="The skills I bring to every build." />
+        <SkillGraph center="Experienced Candidate" skills={skills} />
       </div>
     </section>
   )

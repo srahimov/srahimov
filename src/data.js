@@ -86,30 +86,22 @@ export const projects = [
   },
 ]
 
-export const experience = [
-  {
-    period: '2024 — Present',
-    role: 'AI Engineer',
-    company: 'Company Name',
-    points: [
-      'Built production LLM agents with LangGraph serving thousands of requests per day.',
-      'Introduced LangSmith tracing and evals, cutting regression bugs before release.',
-      'Designed RAG pipelines over company knowledge with measurable accuracy gains.',
-    ],
-  },
-  {
-    period: '2022 — 2024',
-    role: 'Software Engineer',
-    company: 'Company Name',
-    points: [
-      'Developed full-stack web and mobile apps with React and React Native.',
-      'Integrated third-party APIs and automated data workflows.',
-    ],
-  },
-  {
-    period: '2020 — 2022',
-    role: 'Developer',
-    company: 'Company Name',
-    points: ['Shipped features across the stack and maintained CI/CD pipelines.'],
-  },
+// Work Experience graph: skills orbiting the center node.
+export const skills = [
+  'Agentic RAG',
+  'Agentic AI',
+  'Tool Calling',
+  'Python',
+  'Hallucination Detection',
+  'Structured Output',
+  'Prompt Engineering',
+  'Salesforce',
+  'Go HighLevel',
+  'Canva',
+  'Playwright',
+  'GitHub',
+  'Postgres',
+  'Authentication',
+  'Authorization',
+  'Agentic Workflows',
 ]
