@@ -59,3 +59,11 @@ simulated execution trace. Demo replies and fictional specialist steps are remov
 time. No browser API key is needed. The existing `/multimodal-rag` page keeps its
 original API and its independent `VITE_RAG_API_URL` override. Both pages use a
 200-character question limit, a 60-second client deadline and no automatic retry.
+
+Sources on the subagent page appear automatically below each answer. Approved
+source images and table images are embedded inline, and approved Markdown table
+excerpts load as plain text without opening another tab. Source links remain
+available if a preview cannot load. Text-only citations display their filename and
+physical page reference; the API does not return an excerpt for those citations.
+A completed response with no citations explicitly says no sources were returned.
+No additional model calls are made to display source previews.

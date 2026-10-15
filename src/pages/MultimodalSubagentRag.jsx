@@ -9,6 +9,44 @@ const examples = [
   'Describe the illustration of a physician and his patient.',
 ]
 
+function SourcePreview({ link, source }) {
+  const image = new URL(link.url).pathname.endsWith('.png')
+  const [preview, setPreview] = useState(null)
+  const [unavailable, setUnavailable] = useState(false)
+
+  useEffect(() => {
+    if (image) return
+    const controller = new AbortController()
+    setPreview(null)
+    setUnavailable(false)
+    // Only approved public excerpt links from the API; no browser credentials.
+    fetch(link.url, {
+      credentials: 'omit',
+      referrerPolicy: 'no-referrer',
+      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]),
+    }).then(async (response) => {
+      if (!response.ok) throw new Error('Source preview unavailable')
+      const text = await response.text()
+      if (!controller.signal.aborted) setPreview(text)
+    }).catch(() => {
+      if (!controller.signal.aborted) setUnavailable(true)
+    })
+    return () => controller.abort()
+  }, [link.url, image])
+
+  if (unavailable) return <p className="source-preview-note">Preview unavailable. Use the source link above.</p>
+  if (image) return (
+    <figure className="source-preview">
+      <img src={link.url} alt={`${source.citation_id}: ${source.source}, page ${source.physical_pages.join(', ')}`}
+        loading="lazy" referrerPolicy="no-referrer" onError={() => setUnavailable(true)} />
+      <figcaption>{source.content_type === 'table_summary' ? 'Source table' : 'Source image'} · {source.citation_id}</figcaption>
+    </figure>
+  )
+  return preview === null
+    ? <p className="source-preview-note">Loading source preview…</p>
+    : <pre className="source-excerpt">{preview}</pre>
+}
+
 export default function MultimodalSubagentRag() {
   const [question, setQuestion] = useState('')
   const [status, setStatus] = useState('idle') // idle | loading | done | error
@@ -153,9 +191,10 @@ export default function MultimodalSubagentRag() {
             {(status === 'done' || status === 'error') && result && (
               <>
                 <p className={`answer ${status === 'error' ? 'is-error' : ''}`}>{result.answer}</p>
-                {result.sources?.length > 0 && (
-                  <div className="sources">
-                    <h3 className="mono">Sources</h3>
+                {status === 'done' && (
+                  <div className="sources" aria-labelledby="subagent-sources-heading">
+                    <h3 className="mono" id="subagent-sources-heading">Sources · {result.sources.length}</h3>
+                    {!result.sources.length && <p>No sources were returned for this answer.</p>}
                     <ol>
                       {result.sources.map((source) => (
                         <li key={source.citation_id}>
@@ -165,6 +204,9 @@ export default function MultimodalSubagentRag() {
                             <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer" className="citation-link">
                               {link.label}
                             </a>
+                          ))}
+                          {citationLinks(source).filter(link => /\.(png|md)$/.test(new URL(link.url).pathname)).map(link => (
+                            <SourcePreview key={link.url} link={link} source={source} />
                           ))}
                         </li>
                       ))}
