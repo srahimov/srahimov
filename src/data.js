@@ -53,12 +53,12 @@ export const projects = [
     link: '/multimodal-subagent-rag',
   },
   {
-    title: 'Knowledge Base RAG Assistant',
-    tech: ['LangChain', 'LangSmith'],
+    title: 'Document Knowledge RAG Assistant',
+    tech: ['LangChain', 'LangGraph'],
     description:
-      'Retrieval-augmented chatbot over internal documents with hybrid search, source citations and automatic evaluation of answer faithfulness.',
-    highlights: ['Hybrid vector + keyword retrieval', 'Cited answers', 'Eval datasets in LangSmith'],
-    link: 'https://github.com/srahimov',
+      'A Python agentic RAG assistant for Skyview Hotel that searches five current PDFs, cites source documents and supports follow-up questions with conversation memory.',
+    highlights: ['Five-document knowledge base', 'Source-cited answers', 'Saved vector index + chat memory'],
+    link: 'https://github.com/srahimov/document-knowledge-assistant',
   },
   {
     title: 'Multi-Agent Research Workflow',
