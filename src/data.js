@@ -78,11 +78,11 @@ export const projects = [
   },
   {
     title: 'Tool-Calling Customer Support Agent',
-    tech: ['LangGraph', 'LangSmith'],
+    tech: ['LangChain', 'LangGraph', 'Supabase'],
     description:
-      'Agent that reads orders, issues refunds through guarded tools and escalates to a human when confidence is low.',
-    highlights: ['Typed tool schemas', 'Guardrails & escalation', 'Online feedback loop'],
-    link: 'https://github.com/srahimov',
+      'Python support copilot for Fox Insurance Service with department routing, permission-checked tools and persistent human approval for ticket updates.',
+    highlights: ['Typed tools & structured output', 'Approve, edit or reject updates', 'Postgres conversation memory'],
+    link: 'https://github.com/srahimov/customer-support-pilot',
   },
 ]
 
